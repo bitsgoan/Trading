@@ -1,0 +1,38 @@
+import requests
+import pandas as pd
+import json
+
+headers = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.53 Safari/537.36 Edg/103.0.1264.37','accept-encoding': 'gzip, deflate, br','accept-language': 'en-GB,en;q=0.9,en-US;q=0.8'}
+url = 'https://www.nseindia.com/api/option-chain-indices?symbol=NIFTY'
+session = requests.Session()
+
+request = session.get(url,headers=headers)
+cookies = dict(request.cookies)
+response = session.get(url,headers=headers,cookies=cookies).json()
+
+rawdata = pd.DataFrame(response)
+rawop = pd.DataFrame(rawdata['records']['data']).fillna(0)
+data = []
+
+rawop.head()
+
+rawop['expiryDate'].unique()
+
+rawop_oct = rawop[rawop.expiryDate == "27-Oct-2022"]
+rawop_oct
+
+rawop_oct.reset_index(inplace = True)
+rawop_oct.drop(['index'], axis = 1)
+rawop_oct.head()
+
+rawop_oct_pe = rawop_oct['PE']
+rows_pe = rawop_oct_pe.shape[0]
+
+rawop_oct_pe[0]
+
+for i in range(rows_pe):
+    rawop_oct_pe[i]['pe-ce'] = 'pe'
+    print(rawop_oct_pe[i])
+    
+pd.DataFrame([rawop_oct_pe[0], rawop_oct_pe[0]])
+#Tis is a sample to combine all data
